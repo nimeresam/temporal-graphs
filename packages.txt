@@ -1,0 +1,3 @@
+pyspark==3.5.0
+graphframes==0.6
+setuptools==69.0.3
