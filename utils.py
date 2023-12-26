@@ -23,5 +23,5 @@ def toGraph(df):
   edges = df.select(
     col('SOURCE_SUBREDDIT').alias('src'),
     col('TARGET_SUBREDDIT').alias('dst')
-  ).groupBy('src', 'dst').count().filter('count > 20')
+  ).groupBy('src', 'dst').count().filter('count > 5')
   return GraphFrame(vertices, edges).dropIsolatedVertices()

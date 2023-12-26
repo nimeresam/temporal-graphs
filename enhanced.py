@@ -1,8 +1,12 @@
+import time
+
 from pyspark import SparkConf, SparkContext
 from pyspark.sql import SQLContext, SparkSession
 from graphframes import *
 
 from utils import readRawDF, toGraph
+
+overall_time = time.time()
 
 conf = SparkConf().setAppName('graph_processing') \
                   .set('spark.jars.packages', 'graphframes:graphframes:0.8.1-spark3.0-s_2.12')
@@ -11,6 +15,7 @@ sqlContext = SQLContext(sc)
 spark = SparkSession(sc)
 
 raw = readRawDF(spark)
+print('Total records: ', raw.count())
 
 years = [2014, 2015, 2016, 2017]
 
@@ -19,6 +24,7 @@ for y in years:
   df =  raw.filter(raw.YEAR == y)
   graph = toGraph(df)
   rdds.append(graph.edges.rdd)
+  print('YEAR:', y, ', COUNT:', graph.edges.count())
   
 def getLeftEdges(rdds):
   left_rdd = rdds[0]
@@ -49,5 +55,7 @@ for [src, value] in left_edges.items():
   for (dst, count) in value.items():
     output.append([src, dst, count])
 df = sc.parallelize(output).toDF(['src', 'dst', 'count'])
+
+print('Overall time needed:', time.time() - overall_time)
 # Stop SparkSession
 spark.stop()
